@@ -18,6 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemException;
 
 public class TSModuleLoader extends DefaultESModuleLoader {
+  private final TSCompiler tsCompiler = new TSCompiler();
+
   protected TSModuleLoader(JSRealm realm) {
     super(realm);
   }
@@ -41,5 +43,30 @@ public class TSModuleLoader extends DefaultESModuleLoader {
         return super.resolveImportedModule(referrer, tsModuleRequest);
       }
     }
+  }
+
+  @Override
+  protected JSModuleRecord loadModuleFromUrl(ScriptOrModule referrer, Module.ModuleRequest moduleRequest, TruffleFile maybeModuleFile, String maybeCanonicalPath) throws IOException {
+    var maybeModuleFilePath = maybeModuleFile.getPath();
+    if (maybeModuleFile.exists() && maybeModuleFilePath.endsWith(".ts")) {
+      var canonicalPath = maybeModuleFile.getCanonicalFile().getPath();
+      var maybeModuleMapEntry = moduleMap.get(canonicalPath);
+      if (maybeModuleMapEntry != null) {
+        return maybeModuleMapEntry;
+      }
+
+      var content = new String(maybeModuleFile.readAllBytes(), StandardCharsets.UTF_8);
+      Source source = tsCompiler.compileToNewSource(content, moduleRequest.getSpecifier().toJavaStringUncached(), true);
+      JSModuleData parsedModule = realm.getContext().getEvaluator().envParseModule(realm, source);
+      var module = new JSModuleRecord(parsedModule, this);
+      moduleMap.put(canonicalPath, module);
+      return module;
+    }
+    return super.loadModuleFromUrl(referrer, moduleRequest, maybeModuleFile, maybeCanonicalPath);
+  }
+
+  @Override
+  public JSModuleRecord loadModule(Source source, JSModuleData moduleData) {
+    return super.loadModule(source, moduleData);
   }
 }

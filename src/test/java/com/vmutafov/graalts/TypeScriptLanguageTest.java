@@ -71,5 +71,9 @@ public class TypeScriptLanguageTest {
       ).getMember("data");
       assertEquals("test data", res.asString());
     }
+
+    Files.deleteIfExists(indexPath);
+    Files.deleteIfExists(libPath);
+    Files.deleteIfExists(dirPath);
   }
 }
