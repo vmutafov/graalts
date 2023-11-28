@@ -36,18 +36,19 @@ public class TypeScriptLanguage extends TruffleLanguage<JSRealm> {
   public static final String NAME = "TypeScript";
   public static final String IMPLEMENTATION_NAME = "TypeScript";
   public static final String ID = "ts";
-  private final TSCompiler tsCompiler = new TSCompiler();
+  private TSCompiler tsCompiler;
   private Env env;
 
   @Override
   protected JSRealm createContext(Env env) {
     this.env = env;
+    tsCompiler = new TSCompiler(env);
     LanguageInfo jsInfo = env.getInternalLanguages().get("js");
     env.initializeLanguage(jsInfo);
     var javaScriptLanguage = JavaScriptLanguage.getCurrentLanguage();
 
     JSRealm jsRealm = javaScriptLanguage.getJSContext().createRealm(env);
-    JSRealmPatcher.setTSModuleLoader(jsRealm, new TSModuleLoader(jsRealm));
+    JSRealmPatcher.setTSModuleLoader(jsRealm, new TSModuleLoader(jsRealm, tsCompiler));
 
     return jsRealm;
   }
@@ -64,7 +65,7 @@ public class TypeScriptLanguage extends TruffleLanguage<JSRealm> {
     return wrapper.getCallTarget();
   }
 
-  private static class TSRootNode extends RootNode {
+  private class TSRootNode extends RootNode {
     private final RootNode delegate;
 
     protected TSRootNode(TruffleLanguage<?> language, RootNode delegate) {
@@ -75,7 +76,7 @@ public class TypeScriptLanguage extends TruffleLanguage<JSRealm> {
     @Override
     public Object execute(VirtualFrame frame) {
       JSRealm realm = JSRealm.get(delegate);
-      JSRealmPatcher.setTSModuleLoader(realm, new TSModuleLoader(realm));
+      JSRealmPatcher.setTSModuleLoader(realm, new TSModuleLoader(realm, tsCompiler));
       return delegate.execute(frame);
     }
   }

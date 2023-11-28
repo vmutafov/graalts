@@ -12,16 +12,14 @@ import com.oracle.truffle.js.runtime.objects.JSModuleRecord;
 import com.oracle.truffle.js.runtime.objects.ScriptOrModule;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystemException;
 
 public class TSModuleLoader extends DefaultESModuleLoader {
-  private final TSCompiler tsCompiler = new TSCompiler();
+  private final TSCompiler tsCompiler;
 
-  protected TSModuleLoader(JSRealm realm) {
+  protected TSModuleLoader(JSRealm realm, TSCompiler tsCompiler) {
     super(realm);
+    this.tsCompiler = tsCompiler;
   }
 
   @Override

@@ -2,7 +2,6 @@ package com.vmutafov.graalts;
 
 import com.oracle.truffle.api.TruffleFile;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 public final class TSFileTypeDetector implements TruffleFile.FileTypeDetector {
