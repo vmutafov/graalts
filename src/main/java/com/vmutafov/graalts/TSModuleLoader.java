@@ -56,7 +56,7 @@ public class TSModuleLoader extends DefaultESModuleLoader {
       }
 
       var content = new String(maybeModuleFile.readAllBytes(), StandardCharsets.UTF_8);
-      Source source = tsCompiler.compileToNewSource(content, moduleRequest.getSpecifier().toJavaStringUncached(), true);
+      Source source = tsCompiler.compileToNewSource(content, moduleRequest.getSpecifier().toJavaStringUncached(), true, canonicalPath);
       JSModuleData parsedModule = realm.getContext().getEvaluator().envParseModule(realm, source);
       var module = new JSModuleRecord(parsedModule, this);
       moduleMap.put(canonicalPath, module);

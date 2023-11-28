@@ -3,7 +3,9 @@ package com.vmutafov.graalts;
 import com.oracle.truffle.api.source.Source;
 import org.graalvm.polyglot.Context;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Objects;
 
 public class TSCompiler {
@@ -28,22 +30,23 @@ public class TSCompiler {
     }
   }
 
-  public Source compileToNewSource(CharSequence ts, String name, boolean isModule) {
+  public Source compileToNewSource(CharSequence ts, String name, boolean isModule, String filePath) {
     var js = compileToString(ts, name);
-    return Source.newBuilder("js", js, name)
-        .mimeType(isModule ? "application/javascript+module" : "application/javascript")
-        .build();
-  }
-
-  public Source compileToSource(Source source) {
-    var ts = source.getCharacters();
-    var name = source.getName();
-    var mimeType = source.getMimeType();
-    var js = compileToString(ts, name);
-    return Source.newBuilder(source)
-        .mimeType("application/typescript+module".equals(mimeType) ? "application/javascript+module" : mimeType)
-        .content(js)
-        .build();
+    if (filePath == null) {
+      return Source.newBuilder("js", js, name)
+          .mimeType(isModule ? "application/javascript+module" : "application/javascript")
+          .build();
+    } else {
+      try {
+        return Source.newBuilder("js", Path.of(filePath).toUri().toURL())
+            .name(name)
+            .content(js)
+            .mimeType(isModule ? "application/javascript+module" : "application/javascript")
+            .build();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   private static String getTypeScriptServiceCode() {
