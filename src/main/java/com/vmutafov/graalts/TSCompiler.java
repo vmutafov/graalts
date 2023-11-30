@@ -2,6 +2,11 @@ package com.vmutafov.graalts;
 
 import static com.oracle.truffle.api.TruffleLanguage.Env;
 
+import com.oracle.truffle.api.TruffleContext;
+import com.oracle.truffle.api.interop.ArityException;
+import com.oracle.truffle.api.interop.InteropLibrary;
+import com.oracle.truffle.api.interop.UnsupportedMessageException;
+import com.oracle.truffle.api.interop.UnsupportedTypeException;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.strings.TruffleString;
 
@@ -10,23 +15,24 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Objects;
 
-public class TSCompiler {
-
+public class TSCompiler implements AutoCloseable {
   private static final Source TYPESCRIPT_COMPILER_SOURCE = createTypeScriptCompilerSource();
   private static final Source TYPESCRIPT_TRANSPILE_FUNCTION_SOURCE = createTypeScriptTranspileFunctionSource();
-  private final Env env;
+  private final TruffleContext context;
+  private final Object transpileFunction;
 
   public TSCompiler(Env env) {
-    this.env = env;
+    this.context = env.newInnerContextBuilder("js").build();
+    context.evalInternal(null, TYPESCRIPT_COMPILER_SOURCE);
+    transpileFunction = context.evalInternal(null, TYPESCRIPT_TRANSPILE_FUNCTION_SOURCE);
   }
 
   public String compileToString(CharSequence ts, String name) {
-    try (var context = env.newInnerContextBuilder("js")
-        .arguments("js", new String[] {ts.toString(), name})
-        .build()) {
-      context.evalInternal(null, TYPESCRIPT_COMPILER_SOURCE);
-      var js = (TruffleString) context.evalInternal(null, TYPESCRIPT_TRANSPILE_FUNCTION_SOURCE);
+    try {
+      var js = (TruffleString) InteropLibrary.getUncached().execute(transpileFunction, ts, name);
       return js.toJavaStringUncached();
+    } catch (UnsupportedTypeException | ArityException | UnsupportedMessageException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -55,10 +61,7 @@ public class TSCompiler {
 
   private static Source createTypeScriptTranspileFunctionSource() {
     String function = """
-        const code = arguments[0];
-        const fileName = arguments[1];
-        
-        ts.transpile(code, {
+        (code, fileName) => ts.transpile(code, {
           module: "ESNext",
           inlineSourceMap: true,
           inlineSources: true,
@@ -75,5 +78,10 @@ public class TSCompiler {
     } catch (Exception e) {
       throw new RuntimeException("TypeScript compiler not found in resources", e);
     }
+  }
+
+  @Override
+  public void close() {
+    this.context.close();
   }
 }

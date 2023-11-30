@@ -15,7 +15,6 @@ public class TypeScriptLanguageTest {
   @BeforeClass
   public static void beforeTests() {
     System.setProperty("polyglotimpl.DisableClassPathIsolation", "true");
-    System.setProperty("polyglot.engine.WarnInterpreterOnly", "false");
     TypeScriptLanguageTest.class.getClassLoader().setClassAssertionStatus(TypeScriptLanguageTest.class.getName(), false);
   }
 

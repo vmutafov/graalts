@@ -53,6 +53,12 @@ public class TypeScriptLanguage extends TruffleLanguage<JSRealm> {
     return jsRealm;
   }
 
+  @Override
+  protected void finalizeContext(JSRealm context) {
+    super.finalizeContext(context);
+    tsCompiler.close();
+  }
+
   @CompilerDirectives.TruffleBoundary
   @Override
   public CallTarget parse(TruffleLanguage.ParsingRequest parsingRequest) {
