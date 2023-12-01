@@ -10,6 +10,8 @@ try (var context = Context.create()) {
 }
 ```
 
+Some other examples could be found in here: https://github.com/vmutafov/graalts/blob/main/src/test/java/com/vmutafov/graalts/test/TypeScriptLanguageTest.java
+
 ## Why?
 Executing TypeScript code in GraalJS requires compiling it first to JavaScript. Although this could be done with any TypeScript compiler, it requires an additional build step and a bit of knowledge how TypeScript modules are translated to JavaScript.
 
