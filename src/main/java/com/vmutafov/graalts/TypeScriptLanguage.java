@@ -4,7 +4,7 @@ import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.impl.DefaultCallTarget;
+import com.oracle.truffle.api.RootCallTarget;
 import com.oracle.truffle.api.nodes.LanguageInfo;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.Source;
@@ -66,7 +66,7 @@ public class TypeScriptLanguage extends TruffleLanguage<JSRealm> {
     Source jsSource = tsCompiler.compileToNewSource(tsSource.getCharacters(), tsSource.getName(), true, tsSource.getPath());
     List<String> argumentNames = parsingRequest.getArgumentNames();
 
-    var parsed = (DefaultCallTarget) env.parseInternal(jsSource, argumentNames.toArray(new String[0]));
+    var parsed = (RootCallTarget) env.parseInternal(jsSource, argumentNames.toArray(new String[0]));
     var wrapper = new TSRootNode(this, parsed.getRootNode());
     return wrapper.getCallTarget();
   }

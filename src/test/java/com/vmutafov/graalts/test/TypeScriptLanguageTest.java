@@ -1,4 +1,4 @@
-package com.vmutafov.graalts;
+package com.vmutafov.graalts.test;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Source;

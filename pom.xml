@@ -30,19 +30,36 @@
                                 <version>23.1.0</version>
                             </path>
                         </annotationProcessorPaths>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.2</version>
-                    <configuration>
-                        <enableAssertions>false</enableAssertions>
+                        <compilerArgs>
+                            <arg>--add-exports</arg>
+                            <arg>org.graalvm.js/com.oracle.truffle.js.runtime=com.vmutafov.graalts</arg>
+                            <arg>--add-exports</arg>
+                            <arg>org.graalvm.js/com.oracle.truffle.js.runtime.objects=com.vmutafov.graalts</arg>
+                            <arg>--add-exports</arg>
+                            <arg>org.graalvm.js/com.oracle.truffle.js.lang=com.vmutafov.graalts</arg>
+                            <arg>--add-exports</arg>
+                            <arg>org.graalvm.js/com.oracle.js.parser.ir=com.vmutafov.graalts</arg>
+                        </compilerArgs>
                     </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
+        <finalName>graalts</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.2</version>
+                <configuration>
+                    <enableAssertions>false</enableAssertions>
+                    <argLine>
+                        --add-opens org.graalvm.js/com.oracle.truffle.js.runtime=com.vmutafov.graalts
+                        --add-exports org.graalvm.js/com.oracle.truffle.js.runtime.objects=com.vmutafov.graalts
+                        --add-exports org.graalvm.js/com.oracle.truffle.js.lang=com.vmutafov.graalts
+                        --add-exports org.graalvm.js/com.oracle.js.parser.ir=com.vmutafov.graalts
+                    </argLine>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -65,7 +82,6 @@
                 </executions>
             </plugin>
         </plugins>
-        <finalName>typescript</finalName>
     </build>
 
     <dependencies>
