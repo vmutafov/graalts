@@ -71,8 +71,7 @@ public class TSCompiler implements AutoCloseable {
   }
 
   private static String getTypeScriptCompilerCode() {
-    var typescriptServicePath = "/META-INF/resources/webjars/typescript/5.3.2/lib/typescript.js";
-    try (var stream = TSCompiler.class.getResourceAsStream(typescriptServicePath)) {
+    try (var stream = TSCompiler.class.getResourceAsStream("/typescript.js")) {
       var bytes = Objects.requireNonNull(stream).readAllBytes();
       return new String(bytes, StandardCharsets.UTF_8);
     } catch (Exception e) {

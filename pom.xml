@@ -42,15 +42,33 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>download-ts-compiler</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <get src="https://www.unpkg.com/typescript@5.3.2/lib/typescript.js"
+                                     dest="${project.basedir}/src/main/resources/typescript.js"
+                                     verbose="true"
+                                     usetimestamp="true"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <finalName>typescript</finalName>
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>org.webjars.npm</groupId>
-            <artifactId>typescript</artifactId>
-            <version>5.3.2</version>
-        </dependency>
         <dependency>
             <groupId>org.graalvm.js</groupId>
             <artifactId>js-language</artifactId>
