@@ -20,4 +20,4 @@ This Truffle language implementation does not add a custom parser for TypeScript
 
 ## Limitations:
 - Source maps are currently always inlined into the compiled JavaScript. This would most probably change and it would be configured with an option passed to the Context executing the TypeScript code
-- Classpath isolation should be disabled using `-Dpolyglotimpl.DisableClassPathIsolation=true`. This would be fixed soon so that setting this property is not necessary an JS compilation is possible
+- Classpath isolation should be disabled using `-Dpolyglotimpl.DisableClassPathIsolation=true`. This would be fixed soon so that setting this property is not necessary and JS compilation is possible
